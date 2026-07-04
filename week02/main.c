@@ -9,7 +9,10 @@ typedef union {
     uint16_t raw_value;
     struct {
         // HỌC VIÊN BẮT ĐẦU VIẾT CODE TỪ ĐÂY
-
+        uint16_t PWR_ON       : 1;  
+        uint16_t ASSIST_LEVEL : 2;  
+        uint16_t LIGHT_BRIGHT : 4;  
+        uint16_t RESERVED     : 9;
 
 
 
@@ -31,7 +34,24 @@ void drive_sport(void) {
 }
 
 // HỌC VIÊN BẮT ĐẦU VIẾT CODE TỪ ĐÂY
+typedef void (*drive_func_t)(void);
 
+static const drive_func_t drive_modes[] = {
+    drive_eco,
+    drive_normal,
+    drive_sport
+};
+
+void execute_drive_mode(Bike_Status_t status) {
+    uint8_t current_mode = status.fields.ASSIST_LEVEL;
+
+    if (current_mode < 3) {
+        drive_modes[current_mode](); 
+    } 
+    else {
+        printf("[ERROR] Chế độ trợ lực không hợp lệ: %d (Vượt quá giới hạn mảng)!\n", current_mode);
+    }
+}
 
 
 
@@ -44,7 +64,14 @@ void Battery_Monitor(void (*overheat_cb)(void)) {
     int battery_temp = 45; 
     
     // HỌC VIÊN BẮT ĐẦU VIẾT CODE TỪ ĐÂY
-
+typedef void(*overheat_callback_t)(uint_8_t temp);
+    void Battery_Monitor(uint_8_ current_temperature, overheat_callback_t overheat_cb) {
+        if (current_temperature > 40) {
+        if (overheat_cb != NULL) {
+            overheat_cb(current_temperature);
+        }
+    }
+}
 
 
 
@@ -63,6 +90,10 @@ uint32_t total_odometer = 0;
 
 void crash_simulation(void) {
     // HỌC VIÊN BẮT ĐẦU VIẾT CODE TỪ ĐÂY
+    uint8_t buffer[1024]; // để chiếm 1KB
+    buffer[0] = 5;
+    crash_simulation();
+}
 
 
 
