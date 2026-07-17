@@ -1,0 +1,142 @@
+Bài tập về nhà tuần 3
+
+--------------------------------------------------------------------------------
+TASK 1: TỔNG QUAN CÔNG CỤ & LUỒNG LÀM VIỆC
+--------------------------------------------------------------------------------
+
+1.1. Công dụng chính của 4 công cụ:
+
+* CMake:
+  - Là bộ tạo hệ thống build (Build System Generator).
+  - Nhiệm vụ: Đọc file CMakeLists.txt để tạo ra file cấu hình build cho Ninja.
+  - Không trực tiếp biên dịch code.
+
+* Ninja:
+  - Là công cụ thực thi và điều phối quá trình build (Build Tool).
+  - Nhiệm vụ: Đọc file cấu hình từ CMake, kiểm tra các file có thay đổi.
+  - Gọi trình biên dịch chạy song song để tối ưu tốc độ build tối đa.
+
+* arm-none-eabi-gcc:
+  - Trình biên dịch (Compiler) cho vi điều khiển ARM Cortex-M bare-metal.
+  - Nhiệm vụ: Dịch mã nguồn C (.c) thành mã máy (.elf, .hex, .bin).
+
+* STM32_Programmer_CLI:
+  - Công cụ giao diện dòng lệnh (CLI) để quản lý và nạp chương trình của ST.
+  - Nhiệm vụ: Kết nối máy tính với chip STM32 qua mạch nạp (ST-Link).
+  - Thực hiện xóa Flash, nạp file nhị phân và reset chip để chạy code.
+
+
+1.2. Trình tự logic và sự chuyển tiếp dữ liệu:
+
+* Bước 1 (CMake chạy đầu tiên):
+  - Đầu vào: Mã nguồn C và file cấu hình CMakeLists.txt.
+  - Xử lý: Quét cấu hình dự án, cờ biên dịch, đường dẫn thư viện.
+  - Đầu ra: File cấu hình "build.ninja".
+
+* Bước 2 (Ninja chạy tiếp theo):
+  - Đầu vào: File "build.ninja" từ Bước 1.
+  - Xử lý: Quét cây phụ thuộc, xác định chính xác các file cần biên dịch lại.
+  - Đầu ra: Lệnh gọi thực thi biên dịch cụ thể gửi sang cho Compiler.
+
+* Bước 3 (Compiler thực hiện):
+  - Đầu vào: Các file mã nguồn C (.c) theo chỉ định từ Ninja.
+  - Xử lý: Biên dịch thành file đối tượng (.o) và liên kết (Link) chúng lại.
+  - Đầu ra: File nhị phân thực thi cuối cùng (.bin hoặc .hex).
+
+* Bước 4 (STM32_Programmer_CLI chạy cuối cùng):
+  - Đầu vào: File nhị phân (.bin hoặc .hex) từ Bước 3.
+  - Xử lý: Kết nối ST-Link, xóa bộ nhớ Flash cũ, ghi file nhị phân mới vào chip.
+  - Đầu ra: Chương trình chính thức chạy trực tiếp trên phần cứng STM32.
+
+
+--------------------------------------------------------------------------------
+TASK 2: BẢN CHẤT LUỒNG BIÊN DỊCH & TỐI ƯU HÓA
+--------------------------------------------------------------------------------
+
+2.1. Phân bổ vai trò của Linker và sự khác biệt định dạng file:
+
+* Lý do không thể nạp trực tiếp file .o xuống chip (Cần Linker):
+  - File .o chỉ được dịch độc lập trong phạm vi một file .c duy nhất.
+  - Các hàm/biến gọi từ file khác mới chỉ là tham chiếu tạm thời, chưa có địa chỉ.
+  - File .o hoàn toàn không biết cấu trúc phân bổ bộ nhớ phần cứng của chip.
+  - Linker xuất hiện để gom các file .o, đọc Linker Script (.ld) nhằm gán địa chỉ 
+    vật lý thực tế trên RAM/Flash cho từng hàm/biến, ráp nối chúng thành khối hoàn chỉnh.
+
+* Khác biệt cốt lõi giữa file .o riêng lẻ và file .bin cuối cùng:
+  - Tính toàn vẹn: File .o chứa mã máy khuyết thiếu. File .bin chứa mã máy toàn vẹn.
+  - Định vị vùng nhớ: File .o dùng địa chỉ tương đối (từ 0). File .bin dùng địa 
+    chỉ tuyệt đối (khớp với Memory Map của chip, ví dụ Flash từ 0x08000000).
+  - Cấu trúc: File .o chứa thông tin phụ trợ (bảng ký hiệu, debug). File .bin 
+    chỉ chứa dữ liệu thô (Raw Binary) tinh khiết để ghi thẳng vào Flash.
+
+
+2.2. Cơ chế Build tăng dần (Incremental Build) của Ninja:
+
+* Vai trò khi dự án mở rộng:
+  - Giúp cô lập thay đổi khi dự án có hàng trăm file code.
+  - Thay vì biên dịch lại từ đầu (Clean Build) mất nhiều phút hoặc cả tiếng.
+  - Ninja chỉ biên dịch duy nhất file .c nào vừa sửa thành file .o mới.
+  - Gọi Linker ráp file .o mới này với các file .o cũ sẵn có (chỉ mất vài giây).
+
+* Cơ chế xác định file sửa đổi của Ninja:
+  - Dựa trên Đồ thị phụ thuộc (Dependency Graph) kết hợp Dấu thời gian (Timestamp).
+  -  Dựng cây: Đọc build.ninja để dựng quan hệ phụ thuộc (Vd: main.o cần main.c).
+  -  So timestamp: So thuộc tính "Last Modified" của file nguồn và file đích.
+  -  Đánh giá: Nếu Timestamp file .c MỚI HƠN file .o -> Tiến hành biên dịch lại. 
+    Nếu file .o mới hơn -> Bỏ qua để tiết kiệm thời gian.
+  -  Quét gián tiếp: Kiểm tra cả file header (.h). Nếu file .h thay đổi, 
+    tất cả file .c có #include file .h đó đều được tự động đưa vào danh sách biên dịch lại.
+  -  Tối ưu: Ninja lưu lịch sử vào file .ninja_log để đối chiếu siêu tốc, không 
+    bị chậm do hệ điều hành phải quét đĩa cứng liên tục.
+
+
+--------------------------------------------------------------------------------
+TASK 3: BẢN ĐỒ BỘ NHỚ & LINKER SCRIPT
+--------------------------------------------------------------------------------
+
+3.1. Phân biệt LMA và VMA của vùng .data qua đoạn script:
+
+* Định nghĩa từ đoạn script lệnh (>RAM AT> FLASH):
+  - LMA (Load Memory Address): Là địa chỉ lưu trữ thực tế của dữ liệu khi nạp chương 
+    trình xuống chip. Ở đây LMA thuộc vùng FLASH (được trích xuất qua lệnh LOADADDR(.data)).
+  - VMA (Virtual/Runtime Memory Address): Là địa chỉ hoạt động của dữ liệu khi chương 
+    trình đang chạy. Ở đây VMA thuộc vùng RAM (được đánh dấu từ _sdata đến _edata).
+
+* Tại sao vùng .data cần phải có cả 2 loại địa chỉ?
+  - Bản chất vùng .data chứa các biến toàn cục có khởi tạo giá trị đầu (ví dụ: int a = 5;).
+  - Khi tắt điện (Mất nguồn): Dữ liệu trên RAM sẽ bị xóa sạch, do đó giá trị khởi tạo 
+    bắt buộc phải được lưu trữ bền vững ở bộ nhớ FLASH (địa chỉ LMA).
+  - Khi cấp điện và hoạt động: Vi điều khiển không thể thực hiện các thao tác ghi/đọc 
+    tốc độ cao hoặc thay đổi giá trị biến trực tiếp trên FLASH một cách linh hoạt. 
+    Do đó, biến phải hoạt động trên RAM (địa chỉ VMA) để CPU có thể chỉnh sửa giá trị.
+
+
+3.2. Hiện tượng xảy ra nếu Reset_Handler/Startup code quên sao chép dữ liệu:
+
+* Trạng thái của các biến toàn cục có khởi tạo:
+  - Giá trị ban đầu của các biến này sẽ là các giá trị ngẫu nhiên (rác) hoặc bằng 0 
+    (tùy thuộc vào trạng thái ô nhớ RAM lúc vừa cấp điện).
+  - Chip hoàn toàn không lấy được giá trị gốc ban đầu mà người lập trình đã gán.
+
+* Hệ quả đối với chương trình:
+  - Logic hệ thống bị sai lệch ngay từ đầu (ví dụ: biến cấu hình chế độ, biến cờ hiệu 
+    bị sai giá trị dẫn đến vi điều khiển chạy sai hướng).
+  - Gây ra các lỗi phần cứng nghiêm trọng như HardFault hoặc chương trình bị treo 
+    ngay lập tức khi vừa khởi động (do các hàm cấu hình đọc phải tham số rác).
+
+
+--------------------------------------------------------------------------------
+TASK 4: GÕ LỆNH THỦ CÔNG - KHAI BÁO CÁC CÂU LỆNH ĐIỀU KHIỂN HỆ THỐNG
+--------------------------------------------------------------------------------
+
+4.1. Câu lệnh CMake để cấu hình dự án, ép sử dụng Ninja và xuất file vào thư mục build:
+
+Lệnh thực thi trên Terminal:
+cmake -G Ninja -B build
+
+
+4.2. Câu lệnh gọi Ninja để bắt đầu tiến hành biên dịch (build) dự án:
+
+Lệnh thực thi trên Terminal:
+ninja -C build
+================================================================================
