@@ -1,0 +1,33 @@
+Task 5: Chọn Cách 2 (điều khiển LED phản hồi qua firmware).
+Link video demo Task 5: CHUA_CO_VIDEO - sẽ bổ sung sau khi nạp và quay mạch thật.
+
+Task 1 (Kiến trúc Phần cứng): Bản chất các chế độ GPIO
+•	1.1: Trong cấu trúc bên trong của một chân GPIO Output (Push-Pull), cặp Transistor PMOS và NMOS phối hợp đóng/ngắt như thế nào khi cấu hình chân ở mức logic 1 (3.3V) và mức logic 0 (0V)?
+Được điều khiển bởi 2 transistor: PMOS (Phía trên, nối với nguồn 3.3V) và NMOS (Phía dưới, nối với GND):
+•  Khi cấu hình xuất mức logic 1 (3.3V)
+•	Tín hiệu điều khiển kích hoạt làm cho PMOS dẫn (ON) và NMOS ngắt (OFF).
+•	Chân GPIO được kết nối trực tiếp lên nguồn 3.3V. Mạch ở chế độ đẩy dòng, dòng điện chạy từ nguồn 3.3V qua kênh dẫn của PMOS và đi ra chân GPIO cấp cho tải.
+•  Khi cấu hình xuất mức logic 0 (0V):
+•	Tín hiệu điều khiển kích hoạt làm cho NMOS dẫn (ON) và PMOS ngắt (OFF).
+•	Chân GPIO được kết nối trực tiếp xuống đất. Mạch ở chế độ kéo dòng, dòng điện đi từ phía tải chạy vào chân GPIO qua kênh dẫn của NMOS và về đất(0V).
+
+
+•	1.2: Khi nào ta cần cấu hình một chân GPIO ở chế độ Input Pull-up? 
+1.	Đọc trạng thái của các nút nhấn/công tắc cơ khí nối xuống đất (GND): Khi buông nút, điện trở Pull-up nội sẽ kéo điện áp tại chân lên mức 3.3V (Logic 1) một cách ổn định. Khi bấm nút, chân được nối thẳng xuống GND tạo thành mức 0V (Logic 0).
+2.	Kết nối với các cảm biến hoặc linh kiện có ngõ ra dạng cực máng hở (Open-Drain / Open-Collector): Các linh kiện này chỉ có thể chủ động kéo tín hiệu xuống mức thấp (0V), nên chân vi điều khiển cần bật Pull-up để tạo mức điện áp cao (3.3V) khi linh kiện đó ngắt.
+3.	Giao tiếp các chuẩn đường bus kỹ thuật số phổ biến: Như bus I2C (các đường SDA, SCL) hoặc 1-Wire, nơi các thiết bị chia sẻ chung đường truyền và cần điện trở kéo lên để duy trì trạng thái rảnh (Idle) ở mức logic 1.
+Nếu một chân cấu hình là Input nhưng lại để ở trạng thái Floating (No Pull-up/Pull-down) và không kết nối vào đâu, hiện tượng gì sẽ xảy ra với giá trị đọc được của thanh ghi dữ liệu đầu vào?
+Về mặt vật lý: Chân GPIO lúc này hoạt động giống như một chiếc ăng-ten thu nhỏ. Nó cực kỳ nhạy cảm và dễ bị ảnh hưởng bởi các nguồn nhiễu điện từ trường ở môi trường xung quanh (như sóng Wi-Fi, sóng điện thoại, bức xạ từ nguồn xung, hoặc xung điện cảm ứng từ các đường mạch lân cận). Nhiễu này làm cho điện áp tại chân chip biến thiên liên tục và liên tiếp rơi vào vùng điện áp không xác định (Undefined Region).
+Hậu quả đối với thanh ghi dữ liệu đầu vào (ví dụ thanh ghi IDR trên STM32): Giá trị đọc được của thanh ghi dữ liệu đầu vào sẽ nhảy loạn xạ liên tục giữa 0 và 1 một cách ngẫu nhiên. Hệ thống sẽ liên tục ghi nhận các tín hiệu nhiễu này là các lệnh kích hoạt hợp lệ, dẫn đến việc vi điều khiển xử lý sai phần mềm hoặc gây nhiễu động dòng tiêu thụ tĩnh của chip.
+
+Task 2 (Quy trình Cấu hình ngoại vi): Tầm quan trọng của Xung nhịp (Clock)
+Theo quy trình 3 bước cấu hình ngoại vi nhúng, bước đầu tiên luôn luôn là Cấp nguồn xung nhịp (Enable Peripheral Clock) thông qua hệ thống bus (APB/AHB). Tại sao nhà sản xuất chip (ST) lại mặc định tắt toàn bộ Clock của ngoại vi khi vừa reset chip? 
+1.	Bản chất công nghệ CMOS: Các vi điều khiển hiện đại được chế tạo dựa trên công nghệ bán dẫn CMOS. Trong mạch CMOS, các transistor chỉ tiêu thụ năng lượng đáng kể khi chúng thay đổi trạng thái đóng/ngắt (chuyển mạch điện áp). Khi mạch đứng yên ở một mức logic (trạng thái tĩnh), dòng điện tiêu thụ gần như bằng không.
+2.	Vai trò của Clock: Xung nhịp (Clock) chính là tác nhân liên tục thúc đẩy các transistor trong mạch logic của ngoại vi lật trạng thái (từ 0 lên 1 và ngược lại) với tần số hàng chục, hàng trăm Megahertz (MHz).
+3.	Hậu quả nếu bật hết: Một vi điều khiển có rất nhiều ngoại vi (hàng chục cổng GPIO, nhiều bộ UART, SPI, I2C, Timers, ADC...). Nếu nhà sản xuất mặc định bật tất cả xung nhịp ngay khi reset, toàn bộ các khối logic này sẽ hoạt động đồng thời, khiến dòng tiêu thụ tĩnh của chip vọt lên rất cao, gây lãng phí năng lượng vô ích và làm chip bị nóng, đặc biệt là trong các ứng dụng chạy pin (như thiết bị IoT hay thiết bị cầm tay).
+
+Chuyện gì sẽ xảy ra nếu bạn cấu hình các thanh ghi chức năng của GPIO mà quên bật Clock cho Port đó?
+1.	Thanh ghi "đóng băng", mọi cấu hình đều vô hiệu: Các thanh ghi cấu hình bên trong ngoại vi thực chất là các mạch chốt logic (Flip-Flops) hoạt động đồng bộ theo xung nhịp. Khi không có Clock cấp vào, các mạch chốt này hoàn toàn bị cô lập và "đóng băng". Mọi lệnh ghi (Write) từ CPU thông qua chương trình của bạn vào các địa chỉ thanh ghi đó sẽ bị bỏ qua và không có tác dụng. Thanh ghi vẫn giữ nguyên giá trị mặc định sau khi reset.
+2.	Chân chip không hoạt động: Do thanh ghi cấu hình không thay đổi, chân GPIO đó sẽ không thể chuyển sang chế độ Output hay Input theo ý bạn, mạch logic điều khiển ra/vào của chân hoàn toàn tê liệt.
+3.	Lỗi khó tìm (Silent Failure): Điều nguy hiểm là trong hầu hết các trường hợp, việc ghi vào thanh ghi khi chưa bật Clock không làm vi điều khiển bị crash hay báo lỗi phần cứng (HardFault Exception). Chương trình vẫn chạy tiếp bình thường một cách "im lặng", nhưng phần cứng bên ngoài thì hoàn toàn bất động, khiến việc debug trở nên rất khó khăn nếu không nắm vững quy trình cấu hình.
+
