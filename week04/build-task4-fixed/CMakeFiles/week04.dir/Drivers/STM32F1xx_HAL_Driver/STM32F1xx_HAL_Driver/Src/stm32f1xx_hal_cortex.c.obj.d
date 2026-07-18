@@ -1,0 +1,28 @@
+CMakeFiles/week04.dir/Drivers/STM32F1xx_HAL_Driver/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_cortex.c.obj: \
+ C:\Users\Admin\mliot-embeddedc-2026-hw\week04\Drivers\STM32F1xx_HAL_Driver\STM32F1xx_HAL_Driver\Src\stm32f1xx_hal_cortex.c \
+ C:\Users\Admin\mliot-embeddedc-2026-hw\week04\Drivers\STM32F1xx_HAL_Driver\STM32F1xx_HAL_Driver\Inc/stm32f1xx_hal.h \
+ C:\Users\Admin\mliot-embeddedc-2026-hw\week04\Core\Inc/stm32f1xx_hal_conf.h \
+ C:\Users\Admin\mliot-embeddedc-2026-hw\week04\Drivers\STM32F1xx_HAL_Driver\STM32F1xx_HAL_Driver\Inc/stm32f1xx_hal_rcc.h \
+ C:\Users\Admin\mliot-embeddedc-2026-hw\week04\Drivers\STM32F1xx_HAL_Driver\STM32F1xx_HAL_Driver\Inc/stm32f1xx_hal_def.h \
+ C:\Users\Admin\mliot-embeddedc-2026-hw\week04\Drivers\CMSIS\Device\ST\STM32F1xx\Include/stm32f1xx.h \
+ C:\Users\Admin\mliot-embeddedc-2026-hw\week04\Drivers\CMSIS\Device\ST\STM32F1xx\Include/stm32f103xb.h \
+ C:\Users\Admin\mliot-embeddedc-2026-hw\week04\Drivers\CMSIS\Include/core_cm3.h \
+ C:/PROGRA~2/ARMGNU~1/14EFD8~1.2RE/lib/gcc/arm-none-eabi/14.2.1/include/stdint.h \
+ C:/PROGRA~2/ARMGNU~1/14EFD8~1.2RE/arm-none-eabi/include/stdint.h \
+ C:/PROGRA~2/ARMGNU~1/14EFD8~1.2RE/arm-none-eabi/include/machine/_default_types.h \
+ C:/PROGRA~2/ARMGNU~1/14EFD8~1.2RE/arm-none-eabi/include/sys/features.h \
+ C:/PROGRA~2/ARMGNU~1/14EFD8~1.2RE/arm-none-eabi/include/_newlib_version.h \
+ C:/PROGRA~2/ARMGNU~1/14EFD8~1.2RE/arm-none-eabi/include/sys/_intsup.h \
+ C:/PROGRA~2/ARMGNU~1/14EFD8~1.2RE/arm-none-eabi/include/sys/_stdint.h \
+ C:\Users\Admin\mliot-embeddedc-2026-hw\week04\Drivers\CMSIS\Include/cmsis_version.h \
+ C:\Users\Admin\mliot-embeddedc-2026-hw\week04\Drivers\CMSIS\Include/cmsis_compiler.h \
+ C:\Users\Admin\mliot-embeddedc-2026-hw\week04\Drivers\CMSIS\Include/cmsis_gcc.h \
+ C:\Users\Admin\mliot-embeddedc-2026-hw\week04\Drivers\CMSIS\Device\ST\STM32F1xx\Include/system_stm32f1xx.h \
+ C:\Users\Admin\mliot-embeddedc-2026-hw\week04\Drivers\STM32F1xx_HAL_Driver\STM32F1xx_HAL_Driver\Inc/Legacy/stm32_hal_legacy.h \
+ C:/PROGRA~2/ARMGNU~1/14EFD8~1.2RE/lib/gcc/arm-none-eabi/14.2.1/include/stddef.h \
+ C:\Users\Admin\mliot-embeddedc-2026-hw\week04\Drivers\STM32F1xx_HAL_Driver\STM32F1xx_HAL_Driver\Inc/stm32f1xx_hal_rcc_ex.h \
+ C:\Users\Admin\mliot-embeddedc-2026-hw\week04\Drivers\STM32F1xx_HAL_Driver\STM32F1xx_HAL_Driver\Inc/stm32f1xx_hal_flash.h \
+ C:\Users\Admin\mliot-embeddedc-2026-hw\week04\Drivers\STM32F1xx_HAL_Driver\STM32F1xx_HAL_Driver\Inc/stm32f1xx_hal_flash_ex.h \
+ C:\Users\Admin\mliot-embeddedc-2026-hw\week04\Drivers\STM32F1xx_HAL_Driver\STM32F1xx_HAL_Driver\Inc/stm32f1xx_hal_gpio.h \
+ C:\Users\Admin\mliot-embeddedc-2026-hw\week04\Drivers\STM32F1xx_HAL_Driver\STM32F1xx_HAL_Driver\Inc/stm32f1xx_hal_gpio_ex.h \
+ C:\Users\Admin\mliot-embeddedc-2026-hw\week04\Drivers\STM32F1xx_HAL_Driver\STM32F1xx_HAL_Driver\Inc/stm32f1xx_hal_cortex.h
