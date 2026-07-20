@@ -1,3 +1,0 @@
-C:/Users/Admin/mliot-embeddedc-2026-hw/week04/build-task5-fixed/CMakeFiles/week04.dir
-C:/Users/Admin/mliot-embeddedc-2026-hw/week04/build-task5-fixed/CMakeFiles/edit_cache.dir
-C:/Users/Admin/mliot-embeddedc-2026-hw/week04/build-task5-fixed/CMakeFiles/rebuild_cache.dir

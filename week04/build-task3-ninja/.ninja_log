@@ -1,9 +1,0 @@
-# ninja log v7
-19	75	8060645895835354	CMakeFiles/week04.dir/Core/Src/startup_stm32f103xb.s.obj	3628a9bc1c40382b
-4	115	8060645895684896	CMakeFiles/week04.dir/Task3/main.c.obj	edaa07fe1c1d6404
-12	119	8060645895770241	CMakeFiles/week04.dir/Core/Src/system_stm32f1xx.c.obj	88b6355d31c212b2
-25	156	8060645895896107	CMakeFiles/week04.dir/Drivers/STM32F1xx_HAL_Driver/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal.c.obj	74d76d538b883fe9
-38	159	8060645896026444	CMakeFiles/week04.dir/Drivers/STM32F1xx_HAL_Driver/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio.c.obj	f3d4a66375c4659a
-32	160	8060645895956323	CMakeFiles/week04.dir/Drivers/STM32F1xx_HAL_Driver/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_cortex.c.obj	ce2ebecc61d43275
-45	188	8060645896096807	CMakeFiles/week04.dir/Drivers/STM32F1xx_HAL_Driver/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_rcc.c.obj	76c226c95d609317
-188	377	8060645897524719	week04	f274c03f8d8614c0
